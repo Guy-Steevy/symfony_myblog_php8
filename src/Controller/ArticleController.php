@@ -12,26 +12,27 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class ArticleController extends AbstractController
 {
- public function __construct(EntityManagerInterface $manager){
-       $this->manager = $manager;
- }
+    public function __construct(EntityManagerInterface $manager)
+    {
+        $this->manager = $manager;
+    }
 
     #[Route('/admin/article', name: 'app_article')]
     public function index(Request $request): Response
     {
-           $article = new Article(); // Nouvelle instance de article
-           $form = $this->createForm(ArticleType::class,$article); // Création du formulaire
-           $form->handleRequest($request); // Traitement du formulaire
-           if($form->isSubmitted() && $form->isValid()){ 
-// recuperer l'utilisateur connecter et envoyer le prenom dans le setAuteur.
+        $article = new Article(); // Nouvelle instance de article
+        $form = $this->createForm(ArticleType::class, $article); // Création du formulaire
+        $form->handleRequest($request); // Traitement du formulaire
+        if ($form->isSubmitted() && $form->isValid()) {
+            // recuperer l'utilisateur connecter et envoyer le prenom dans le setAuteur.
 
-                 $article->setAuteur($this->getUser()->getPrenom());
+            $article->setAuteur($this->getUser()->getPrenom());
 
-               $this->manager->persist($article);
-               $this->manager->flush();
-               return $this->redirectToRoute('app_home');
-           };
-            
+            $this->manager->persist($article);
+            $this->manager->flush();
+            return $this->redirectToRoute('app_home'); // renvoi vers la page d'acceuil
+        };
+
         return $this->render('article/index.html.twig', [
             'formArticle' => $form->createView(),
         ]);
@@ -45,25 +46,23 @@ class ArticleController extends AbstractController
         $this->manager->remove($article);
         $this->manager->flush();
         return $this->redirectToRoute('app_home');
-
     }
 
 
 
     #[Route('/admin/article/edit/{id}', name: 'app_article_edit')]
-    public function articleEdit(Article $article,Request $request): Response
+    public function articleEdit(Article $article, Request $request): Response
     {
-          $form = $this->createForm(ArticleType::class,$article); // Création du formulaire
-           $form->handleRequest($request); // Traitement du formulaire
-           if($form->isSubmitted() && $form->isValid()){ 
-               $this->manager->persist($article);
-               $this->manager->flush();
-               return $this->redirectToRoute('app_home');
-           };
-            
-           return $this->render('article/editArticle.html.twig', [
+        $form = $this->createForm(ArticleType::class, $article); // Création du formulaire
+        $form->handleRequest($request); // Traitement du formulaire
+        if ($form->isSubmitted() && $form->isValid()) {
+            $this->manager->persist($article);
+            $this->manager->flush();
+            return $this->redirectToRoute('app_home');
+        };
+
+        return $this->render('article/editArticle.html.twig', [
             'formArticle' => $form->createView(),
         ]);
-
     }
 }

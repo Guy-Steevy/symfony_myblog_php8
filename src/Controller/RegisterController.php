@@ -13,29 +13,38 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class RegisterController extends AbstractController
 {
-     public function __construct(EntityManagerInterface $manager,UserPasswordHasherInterface $passwordHash){
-        $this->manager = $manager;
-         $this->passwordHash = $passwordHash;
-     }
+   public function __construct(EntityManagerInterface $manager, UserPasswordHasherInterface $passwordHash)
+   {
+      $this->manager = $manager;
+      $this->passwordHash = $passwordHash;
+   }
 
-    /**
-     * @Route("/register", name="app_register")
-     */
-    public function index(Request $request): Response
-    {
-         $user = new User();// Nouvelle instance de user
-         $form = $this->createForm(RegisterType::class, $user);// Création du formulaire
-         $form->handleRequest($request);// Traitement du formulaire
-         if($form->isSubmitted() && $form->isValid()) { //Si le formulaire et soumis et valide alor..
-                   $passwordEncod =  $this->passwordHash->hashPassword($user ,$user->getPassword());
-                   $user->setPassword($passwordEncod);
+   /**
+    * @Route("/register", name="app_register")
+    */
+   public function index(Request $request): Response
+   {
+      $user = new User(); // nouvelle instance de ma classe User
+      $form = $this->createForm(RegisterType::class, $user); // création du formulaire
+      $form->handleRequest($request); // traitement du formulaire
 
-                $this->manager->persist($user);// On persiste l'utilisateur
-                $this->manager->flush();// On flush      
+      if ($form->isSubmitted() && $form->isValid()) { // si le formulaire et soumis et valide alors...
+         $emptyPassword = $form->get('password')->getData();
+
+         if ($emptyPassword == null) {
+            $user->setPassword($user->getPassword());
+         } else {
+            $passwordEncod =  $this->passwordHash->hashPassword($user, $emptyPassword);
+            $user->setPassword($passwordEncod);
          }
 
-        return $this->render('register/index.html.twig', [
-           'myForm' => $form->createView() // On passe le formulaire à la vue
-        ]);
-    }
+         $this->manager->persist($user); // pour préparer l'envoi en base de données
+         $this->manager->flush(); // on flush (envoi les données)
+         return $this->redirectToRoute('app_login'); // renvoi vers la page de connexion
+      }
+
+      return $this->render('register/index.html.twig', [
+         'myForm' => $form->createView() // On passe le formulaire à la vue
+      ]);
+   }
 }
