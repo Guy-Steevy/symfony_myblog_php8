@@ -65,4 +65,17 @@ class ArticleController extends AbstractController
             'formArticle' => $form->createView(),
         ]);
     }
+
+    /**
+     * @Route("/admin/allarticle", name="app_all_article")
+     */
+    public function allArticle(): Response
+    {
+        $articles = $this->manager->getRepository(Article::class)->findAll();
+        // logique stocker dans une variable avec tout les articles
+
+        return $this->render('home/index.html.twig', [
+            'articles' => $articles,
+        ]);
+    }
 }
