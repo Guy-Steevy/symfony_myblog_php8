@@ -156,6 +156,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->prenom;
     }
 
+    public function getNomComplet(): ?string
+    {
+        return $this->prenom;
+    }
+
     public function setPrenom(string $prenom): self
     {
         $this->prenom = $prenom;

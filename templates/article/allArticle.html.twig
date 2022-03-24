@@ -12,6 +12,7 @@
       <th scope="col">Description</th>
       <th scope="col">Auteur</th>
       <th scope="col">Publication</th>
+      <th scope="col">Illustration</th>
       <th scope="col">Action</th>
     </tr>
   </thead>
@@ -23,10 +24,10 @@
       <td>{{article.description}}</td>
       <td>{{article.auteur}}</td>
       <td>{{article.publication | date('d/m/y')}}</td>
-      <td><img style="width:120px" src="{{article.photo}}" alt=""></td>
+      <td><img style="width:120px" src="{{article.photo}}" alt="illustration of the photo"></td>
       <td>
        <a href="{{path('app_article_edit',{id: article.id})}}"><i class="text-warning fa fa-edit"></i></a>
-       <a href=""><i class="text-danger fa fa-trash"></i></a>
+       <a href="{{path('app_article_delete',{id: article.id})}}"><i class="text-danger fa fa-trash"></i></a>
       </td>
     </tr>
 {% endfor %}

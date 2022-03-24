@@ -78,4 +78,17 @@ class ArticleController extends AbstractController
             'articles' => $articles,
         ]);
     }
+
+    /**
+     * @Route("/single/article", name="app_single_article")
+     */
+    public function singleArticle(): Response
+    {
+        $article = $this->manager->getRepository(Article::class)->findAll();
+        // logique stocker dans une variable avec tout les articles
+
+        return $this->render('article/singleArticle.html.twig', [
+            'articles' => $article,
+        ]);
+    }
 }
