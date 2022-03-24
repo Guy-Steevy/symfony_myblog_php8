@@ -14,10 +14,10 @@
     {% if is_granted("ROLE_ADMIN") %}
     <p><a href="{{path('app_user')}}">List of users</a></p>
     <p><a href="#">Have a look on the comments</a></p>
+    <p><a href="{{path('app_all_article')}}">See the articles</a></p>
     {% endif %}
 
-    <p><a href="#">See the articles</a></p>
-    <p><a href="#">Edite my profil</a></p>
+    <p><a href="{{path('app_user_edit', {id: app.user.id})}}">Edite my profil</a></p>
 </div>
 
 {% endblock %}
