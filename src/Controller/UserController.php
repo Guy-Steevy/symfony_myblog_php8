@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Form\RegisterType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -23,7 +24,7 @@ class UserController extends AbstractController
         $users = $this->manager->getRepository(User::class)->findAll();
 
         return $this->render('user/index.html.twig', [
-            'controller_name' => 'UserController',
+            'users' => $users
         ]);
     }
 

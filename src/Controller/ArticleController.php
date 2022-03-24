@@ -80,15 +80,23 @@ class ArticleController extends AbstractController
     }
 
     /**
-     * @Route("/single/article", name="app_single_article")
+     * @Route("/single/article/{id}", name="app_single_article")
      */
-    public function singleArticle(): Response
+    public function singleArticle(Article $article): Response
     {
-        $article = $this->manager->getRepository(Article::class)->findAll();
-        // logique stocker dans une variable avec tout les articles
+        /* -----------------------------------------------------------------------------------
+         * CREER le formulaire de commentaires et sa logique
+         * AFFICHER le formulaire dans la modale
+         * lors de la SOUMISSION, envoyer en dtb le commentaire avec les données suivantes :
+         * |-> commentary
+         * |-> user
+         * |-> article
+         * |-> date
+         */
+
 
         return $this->render('article/singleArticle.html.twig', [
-            'articles' => $article,
+            'article' => $article,
         ]);
     }
 }
