@@ -3,7 +3,9 @@
 namespace App\Controller;
 
 use App\Entity\Article;
+use App\Entity\Comment;
 use App\Form\ArticleType;
+use App\Form\CommentType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -82,7 +84,7 @@ class ArticleController extends AbstractController
     /**
      * @Route("/single/article/{id}", name="app_single_article")
      */
-    public function singleArticle(Article $article): Response
+    public function singleArticle(Article $article, Request $request): Response
     {
         /* -----------------------------------------------------------------------------------
          * CREER le formulaire de commentaires et sa logique
@@ -93,10 +95,23 @@ class ArticleController extends AbstractController
          * |-> article
          * |-> date
          */
+        $comment = new Comment();
+        $form = $this->createForm(CommentType::class, $comment);
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $comment->setDate(new \DateTime());
+            $comment->setUser($this->getUser());
+            $comment->setArticle($article);
+            $this->manager->persist($comment);
+            $this->manager->flush();
+            return $this->redirectToRoute('app_single_article', [
+                'id' => $article->getId()
+            ]);
+        }
 
 
         return $this->render('article/singleArticle.html.twig', [
-            'article' => $article,
+            'article' => $article, 'form' => $form->createView()
         ]);
     }
 }

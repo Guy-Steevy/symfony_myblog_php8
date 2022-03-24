@@ -11,7 +11,7 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        ...
+        {{form(form)}}
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -34,7 +34,7 @@
                 </div>
                 <p class="lead">{{article.description}}</p>
                 <div class="d-flex">
-                    <input class="form-control text-center me-3" id="inputQuantity" type="num" value="1" style="max-width: 3rem">
+                    <input class="form-control text-center me-3" id="inputQuantity" type="num" value="{{article.comments | length}}" style="max-width: 3rem">
                     <button class="btn btn-outline-dark " data-bs-toggle="modal" data-bs-target="#exampleModal" type="button">
                         <i class="bi-cart-fill me-1"></i>
                         Post a comment
@@ -43,5 +43,20 @@
             </div>
         </div>
     </div>
+
+
+  <div class="card">
+  {% for comment in article.comments %}
+    <h5 class="card-header">
+      {{comment.user.prenom}}
+    </h5>
+    <div class="card-body">
+      <blockquote class="blockquote mb-0">
+        <p>{{comment.commentary}}</p>
+        <footer class="blockquote-footer">Posted by <cite title="Source Title">{{comment.user.prenom}}</cite></footer>
+      </blockquote>
+    </div>
+    {% endfor %}
+  </div>
 </section>
 {% endblock %}
