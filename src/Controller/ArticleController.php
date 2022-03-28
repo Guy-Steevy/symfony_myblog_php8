@@ -10,7 +10,9 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 
 class ArticleController extends AbstractController
 {
@@ -20,16 +22,34 @@ class ArticleController extends AbstractController
     }
 
     #[Route('/admin/article', name: 'app_article')]
-    public function index(Request $request): Response
+    public function index(Request $request, SluggerInterface $slugger): Response
     {
         $article = new Article(); // Nouvelle instance de article
         $form = $this->createForm(ArticleType::class, $article); // Création du formulaire
         $form->handleRequest($request); // Traitement du formulaire
         if ($form->isSubmitted() && $form->isValid()) {
+
+            $photoArticle = $form->get('photo')->getData();
+            if ($photoArticle) {
+                $originalFilename = pathinfo($photoArticle->getClientOriginalName(), PATHINFO_FILENAME);
+                $safeFilename = $slugger->slug($originalFilename);
+                $newFilename = $safeFilename . '-' . uniqid() . '.' . $photoArticle->guessExtension();
+
+                try {
+                    $photoArticle->move(
+                        $this->getParameter('photos_directory'),
+                        $newFilename
+                    );
+                } catch (FileException $e) {
+                    // ... handle exception if something happens during file upload
+                }
+
+                $article->setPhoto($newFilename);
+            }
+
             // recuperer l'utilisateur connecter et envoyer le prenom dans le setAuteur.
-
             $article->setAuteur($this->getUser()->getPrenom());
-
+            $article->setPublication(new \DateTime()); // on met la date de publication à la date actuelle
             $this->manager->persist($article);
             $this->manager->flush();
             return $this->redirectToRoute('app_home'); // renvoi vers la page d'acceuil
@@ -53,11 +73,33 @@ class ArticleController extends AbstractController
 
 
     #[Route('/admin/article/edit/{id}', name: 'app_article_edit')]
-    public function articleEdit(Article $article, Request $request): Response
+    public function articleEdit(Article $article, Request $request, SluggerInterface $slugger): Response
     {
         $form = $this->createForm(ArticleType::class, $article); // Création du formulaire
         $form->handleRequest($request); // Traitement du formulaire
         if ($form->isSubmitted() && $form->isValid()) {
+
+            $photoArticle = $form->get('photo')->getData(); // on récupère la photo
+            if ($photoArticle) {
+                $originalFilename = pathinfo($photoArticle->getClientOriginalName(), PATHINFO_FILENAME); // on récupère le nom de la photo
+                $safeFilename = $slugger->slug($originalFilename); // on crée un slug qui rend le nom plus lisible pour l'être humain
+                $newFilename = $safeFilename . '-' . uniqid() . '.' . $photoArticle->guessExtension(); // on crée un nom unique pour la photo
+
+                try {
+                    $photoArticle->move(
+                        $this->getParameter('photos_directory'),
+                        $newFilename
+                    );
+                } catch (FileException $e) {
+                    // ... handle exception if something happens during file upload
+                }
+
+                $article->setPhoto($newFilename);
+            } else {
+                dd('aucune photo');
+            }
+
+            $article->setPublication(new \DateTime()); // on met la date de publication à la date actuelle
             $this->manager->persist($article);
             $this->manager->flush();
             return $this->redirectToRoute('app_home');
